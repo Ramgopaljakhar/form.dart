@@ -1,105 +1,109 @@
 import 'dart:convert';
-import 'dart:io';
-import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutterdemo/user.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:io';
 
 
-import 'imagepick.dart';
-
-
-class MyForms extends StatefulWidget {
-  const MyForms({Key? key}) : super(key: key);
-
-  @override
-  State<MyForms> createState() => _MyFormsState();
+class GetStorage {
+  static init() {}
 }
 
-class _MyFormsState extends State<MyForms> {
+class MyForms extends StatelessWidget {
+  
+  // This widget is the root of your application.
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Flutter Demo',
+      theme: ThemeData(
 
+        primarySwatch: Colors.blue,
+      ),
+      home: HomePage(),
+    );
+  }
+}
+
+class HomePage extends StatefulWidget {
+
+
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
   ImagePicker picker = ImagePicker();
   XFile? image;
-  final TextEditingController _name = TextEditingController();
-  final TextEditingController _email = TextEditingController();
 
 
-  Map<String, dynamic>? get jsondatais => null;
-
-  set _userImage(XFile _userImage) {}
-
+  late SharedPreferences sharedPreferences;
 
   @override
   void initState() {
-    //todo :implement initstate
-
+    // TODO: implement initState
     super.initState();
-    initalGetSavedData();
+    initialGetSaved();
   }
 
-  Future<void> initalGetSavedData() async {
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+  void initialGetSaved() async {
+    sharedPreferences = await SharedPreferences.getInstance();
 
-    var N = jsonDecode(SharedPreferences.getInstance() as String);
-    User user = User.fromJson(jsondatais!);
-    print(N);
-    // if(jsondatais.isNotEmpty){
-    //   _name.value = TextEditingValue(text:User.name);
-    //   _email.value = TextEditingValue(text:User.email);
-    // }
+    // Read the data, decode it and store it in map structure
+    Map<String, dynamic> jsondatais = jsonDecode(
+        sharedPreferences.getString('userdata')!);
+
+    var user = User.fromJson(jsondatais);
+
+    if (jsondatais.isNotEmpty) {
+      print(user.name);
+      print(user.email);
+
+      _name.value = TextEditingValue(text: user.name);
+      _email.value = TextEditingValue(text: user.email);
+      _phone.value = TextEditingValue(text: user.phone);
+    }
   }
 
-  Future<void> storedata() async {
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    User user = User(_name.text, _email.text, _MyFormsState() as String?);
+  void storeUserData() {
+    //store the user entered data in user object
+    User user1 = new User(_name.text, _email.text, _phone.text);
 
-    String userdata = jsonEncode(user);
-    print("helloUserdata $userdata");
+    // encode / convert object into json string
+    String user = jsonEncode(user1);
 
-    sharedPreferences.setString('userdata', userdata);
+    print(user);
+
+    //save the data into sharedPreferences using key-value pairs
+    sharedPreferences.setString('userdata', user);
   }
 
+
+  TextEditingController _name = new TextEditingController();
+  TextEditingController _email = new TextEditingController();
+  TextEditingController _phone = new TextEditingController();
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        actions: <Widget>[
-
-          IconButton(
-
-            onPressed: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => MyApp1()));
-            },
-            icon: const Icon(Icons.refresh),
-            color: Colors.black,
-          ),
-        ],
-        backgroundColor: Colors.orange,
-        title: const Text('Form'),
+        title: Text('Save DataModel Data JSON'),
       ),
       body: Container(
-        width: MediaQuery
-            .of(context)
-            .size
-            .width,
-        height: MediaQuery
-            .of(context)
-            .size
-            .height,
+        width: MediaQuery.of(context).size.width,
+        height: MediaQuery.of(context).size.height,
         child: ListView(
           children: [
             Container(
-              margin: const EdgeInsets.only(
-                left: 10, top: 5, right: 10, bottom: 10,),
-              decoration: BoxDecoration(
-                  border: Border.all(color: Colors.black)
-              ),
-              child: Row(
-                children: [
-                  Container(
-                      child: Center(
+              margin: const EdgeInsets.only(left: 5, top: 5, right: 5, bottom: 10,),
+              decoration:
+              BoxDecoration(border: Border.all(color: Colors.black)),
+              child: Container(
+
+                child: Row(
+                  children: [
+                    Container(
                         child: GestureDetector(
                           onTap: () {
                             _showPicker(context);
@@ -129,86 +133,94 @@ class _MyFormsState extends State<MyForms> {
                               ),
                             ),
                           ),
-                        ),
-                      )
-                  ),
-                  Container(
-                    height: 250,
-                    width: MediaQuery
-                        .of(context)
-                        .size
-                        .width - 250,
-
-
-                    child: Column(
-                      children: [
-                        Form(
-                            child: Padding(
-                              padding: const EdgeInsets.only(
-                                  left: 40, top: 40, right: 0, bottom: 0),
-                              child: Column(
-                                children: <Widget>[
-                                  TextField(
-                                    controller: _name,
-                                    decoration: const InputDecoration(
-                                      hintText: "Enter name",
-                                      labelText: AutofillHints.username,
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    height: 20,
-                                  ),
-                                  TextField(
-                                    controller: _email,
-                                    decoration: const InputDecoration(
-                                      hintText: "Enter email",
-                                      labelText: AutofillHints.email,
-                                    ),
-                                  ),
-
-                                ],
-                              ),
-
-                            )),
-                        Container(
-                          margin: EdgeInsets.only(
-                              left: 0, top: 15, right: 0, bottom: 0),
-                          width: MediaQuery
-                              .of(context)
-                              .size
-                              .width - 200,
-                          alignment: Alignment.topRight,
+                        )),
+                    Container(
+                      height: 350,
+                      width: MediaQuery.of(context).size.width - 125,
+                      child: SingleChildScrollView(
+                        child: Center(
                           child: Container(
-                            height: 70,
-                            width: 70,
-                            child: ElevatedButton(
-                                onPressed: () {
-                                  print(image!.path);
-                                },
-                                child: Text("Submit")),
+                            width:700,
+                            margin: EdgeInsets.only(left: 10, top: 15, right: 0, bottom: 0),
+
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 20, top: 5, right: 5, bottom: 10,),
+                                  child: Container(
+                                    height: 60,
+                                    width:500,
+                                    child: TextField(
+                                      controller: _name,
+                                      decoration: InputDecoration(
+                                          border: OutlineInputBorder(),
+                                          labelText: 'Enter name'
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(16.0),
+                                  child: Container(
+                                    height: 60,
+                                    width:500,
+                                    child: TextField(
+                                      controller: _email,
+                                      decoration: InputDecoration(
+                                          border: OutlineInputBorder(),
+                                          labelText: 'Enter Email'
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(16.0),
+                                  child: Container(
+                                    height: 55,
+                                    width:500,
+                                    child: TextField(
+                                      controller: _phone,
+                                      decoration: InputDecoration(
+                                          border: OutlineInputBorder(),
+                                          labelText: 'Enter Phone'
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                ElevatedButton(onPressed: () {
+                                  storeUserData();
+                                }, child: Text('SAVE')),
+                                ElevatedButton(onPressed: () {
+                                  _name.value = TextEditingValue(text: '');
+                                  _email.value = TextEditingValue(text: '');
+                                  _phone.value = TextEditingValue(text: '');
+                                  sharedPreferences.remove('userdata');
+                                }, child: Text('SUBMIT'))
+                              ],
+                            ),
                           ),
                         ),
+                      ),
+                    )
 
-                      ],
+                  ],
+                ),
 
-                    ),
-                  ),
-
-                ],
               ),
-
             ),
-
           ],
         ),
-
       ),
+
+
     );
   }
 
   _showPicker(BuildContext context) async {
     PickedFile? pickedFile = (await ImagePicker().pickImage(
-      source: ImageSource.gallery,
+      source: ImageSource.camera,
       maxWidth: 150,
       maxHeight: 150,
     )) as PickedFile?;
@@ -219,14 +231,6 @@ class _MyFormsState extends State<MyForms> {
     }
   }
 }
-
-
-
-
-
-
-
-
 
 
 
