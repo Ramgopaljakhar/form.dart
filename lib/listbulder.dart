@@ -5,6 +5,7 @@ import 'package:flutterdemo/user.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io';
+import 'OpeartionClasss.dart';
 import 'lists.dart';
 
 class ListExample extends StatefulWidget {
@@ -32,8 +33,13 @@ class _ListExampleState extends State<ListExample> {
     // TODO: implement initState
     super.initState();
     initialGetSaved();
+    quesValueE();
   }
 
+  quesValueE(){
+    var user = OpeartionClasss.fromJson(quesValue);
+    print(user);
+  }
   void initialGetSaved() async {
 
 
@@ -87,7 +93,7 @@ class _ListExampleState extends State<ListExample> {
           IconButton(
 
             onPressed:() {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => ListsExample()));
+              Navigator.push(context, MaterialPageRoute(builder: (context) => ListExample()));
             },
             icon:const Icon(Icons.refresh),
             color:Colors.black,
@@ -112,6 +118,7 @@ class _ListExampleState extends State<ListExample> {
                           child: CircleAvatar(
                             radius: 55,
                             backgroundColor: Color(0xffFDCF09),
+                            backgroundImage:AssetImage("assets/images/pexels-photo-39811.jpeg"),
                             child: image != null
                                 ? ClipRRect(
                               borderRadius: BorderRadius.circular(50),
@@ -120,9 +127,9 @@ class _ListExampleState extends State<ListExample> {
                                 width: 100,
                                 height: 100,
                                 fit: BoxFit.fitHeight,
-                              ),
-                            )
-                                : Container(
+                             ),
+                             )
+                              : Container(
                               decoration: BoxDecoration(
                                   color: Colors.grey[200],
                                   borderRadius: BorderRadius.circular(50)),
@@ -143,8 +150,7 @@ class _ListExampleState extends State<ListExample> {
                         children: [
                           Form(
                             child: Padding(
-                              padding: const EdgeInsets.only(
-                                  left: 10, top: 40, right: 0, bottom: 0),
+                              padding: const EdgeInsets.only(left: 10, top: 40, right: 0, bottom: 0),
                               child: Column(
                                 children: <Widget>[
                                   Padding(
@@ -223,7 +229,6 @@ class _ListExampleState extends State<ListExample> {
                   ),
                 ],
               ),
-
               ListView.builder(
                 itemCount: a.length,
                   shrinkWrap: true,
@@ -247,7 +252,7 @@ class _ListExampleState extends State<ListExample> {
                                           radius: 55,
                                           backgroundColor: Color(0xffFDCF09),
                                           child: image != null
-                                              ? ClipRRect(
+                                              ? ClipRRect (
                                             borderRadius: BorderRadius.circular(50),
                                             child: Image.file(
                                               File(image!.path),
